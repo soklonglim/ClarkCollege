@@ -1,0 +1,142 @@
+#
+#Soklong Lim
+#CSE 224
+#HW #6
+#Nov 14, 2014
+#
+#Description:
+#This is a Shell programming for HighLow game. User thinks of a number before starting the game
+#default Low=1 & High=100 but user can set the High to whatever they want
+#then Low=1 & High=(the number user sets).
+#This game can detect whether or not user is cheating.
+#
+
+
+
+
+#initialize values for loop
+y=0;
+
+#detecting high number otherwise set to default
+   if [ "$1" == "" ]
+   then #default setting of high, low and guess number
+      let lo=1
+      let hi=100
+      let guess=(hi+lo)/2
+      let y=1 #return value for the next 'if' condition
+   
+   else
+       if [[ $1 =~ ^[0-9][0-9]*$ ]] #limit the arugment to only positive interger
+       then
+           if [ $1 -ge 10 ] #check the limit of high number to at least 10
+           then
+               let lo=1
+               let hi=$1 #set the user's entry argument to high
+               let guess=(hi+lo)/2
+               let y=1 #return value for the next 'if' operation
+
+           else #mseg for user to enter at least #10
+               echo -e "\nplease enter the number at least greater than or equal to 10."
+               echo -e "it is more fun.\n"
+               exit
+           fi
+
+       else #default setting of high, low and guess number
+           let lo=1
+           let hi=100
+           let guess=(hi+lo)/2
+           let y=1 #return value for the next 'if' condition
+       fi
+   fi
+
+#clear screen before entering the game
+clear
+
+#instruction block
+cat << EOF
+
+
+                     Welcome to HiLow Game
+   Instruction:
+   If you did not specify any argument, L=1 & H=100 by default.
+   If you specified a number, L=1 & H=(the number you set).
+
+   Note: H=Hight, L=Low, C=Correct, Q=Quit
+   If the guessing number is high, press H and hit Enter.
+   If the guessing number is low, press L and hit Enter.
+   If the guessing number is correct, press C and hit Enter.
+   If you wish to quit the game, press Q and hit Enter.
+
+   before you begin, please think of a number between $lo and $hi.
+   hit Enter to start whenever you are ready. 
+   Have Fun!!!
+
+
+EOF
+
+if [ "$y" -eq 1 ] #continue after setting up high/low boundary & initial guess
+then
+
+   while [ 1 ] #infinit loop to dectect Enter key to start the game
+   do 
+      #prompt to detect if the user hit Enter to star the game
+      read -p "please hit ENTER to start the game! " hitenter
+      echo " "
+
+      if [ ${#hitenter} -eq 0 ]
+      then
+         let b=1 #return value for the next 'if' condition
+         break   #break out the loop when Enter key was hit
+      fi
+   done
+
+   if [ "$b" -eq 1 ] #continue after Enter key was hit
+   then
+   
+      while [ 1 ] #infinit loop for interacting with user while guessing 
+      do
+        
+        echo -e "\nyour number is $guess?"   #display guess number to player
+
+        read -p "press H, L, C or Q and hit Enter: " input    #read input frm player
+        
+        case $input in    #case condition
+
+        h|H) #when h/H was hit
+           let hi=$guess-1 #reset new high value when h/H was hit
+               if [ $hi -lt $lo ] #detec whether or not player is cheating
+               then 
+                   echo -e "\nyou are cheating.\n"
+                   exit
+               fi
+           let guess=($lo+$hi)/2 #new guess number
+        ;;
+ 
+        l|L) #when l/L was hit
+            let lo=$guess+1 #reset new low value
+               if [ $hi -lt $lo ] #detect whether or not player is cheating
+               then 
+                   echo -e "\nyou are cheating.\n"
+                   exit
+               fi
+            let guess=($lo+$hi)/2 #new guess number
+        ;;
+
+        c|C) #display player's number and quit the game when C/c was hit
+            echo -e "\nyour number is $guess"
+            echo -e "Thank for playing\n"
+            exit
+        ;;
+
+        q|Q) #quit the game when Q/q was hit
+            echo -e "\nYou just quit, Anyway, Thanks!!!\n"
+            exit
+        ;;
+
+        *) #default case if player does not enter the given prompt options
+            echo -e "\nplease enter either H, L, C or Q"  
+        ;;
+        esac #end of case
+      done #end of while
+   fi #end of '$b' if
+fi #end of '$y' if
